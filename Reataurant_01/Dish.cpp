@@ -3,7 +3,6 @@
 
 Dish::Dish()
 {
-	cszDishName;
 	nDishPrice = NULL;
     cDishType = Undefined;
 }
