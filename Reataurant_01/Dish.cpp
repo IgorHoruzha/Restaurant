@@ -75,7 +75,7 @@ const wstring Dish::mGetDishDescription()const
 		description += L" Dessert Dish";
 		break;
 	default:
-		description += L"Undefined";
+		description += L" Undefined";
 		break;
 	}
 	return description;
