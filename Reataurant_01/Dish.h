@@ -5,8 +5,6 @@ using std::wstring;
 using std::wofstream;
 
 
-
-
 class Dish
 {
 public:

@@ -1,7 +1,6 @@
 #include "Dish.h"
 
 
-
 Dish::Dish()
 {
 	cszDishName;
@@ -15,9 +14,6 @@ Dish::Dish(const wstring& acszDishName, const double& anDishPrice,const DishType
 	nDishPrice = anDishPrice;
 	cDishType = acDishType;
 }
-
-
-
 
 void Dish::mSetDishName(const wstring &acszDishName)
 {
@@ -39,9 +35,7 @@ void Dish::mSetAllFilds(const wstring &acszDishName, const double &anDishPrice, 
 	mSetDishName(acszDishName);
 	mSetDishPrice(anDishPrice);
 	mSetDishType(acDishType);
-
 }
-
 
 const wstring & Dish::mGetDishName() const
 {
@@ -80,4 +74,3 @@ const wstring Dish::mGetDishDescription()const
 	}
 	return description;
 }
-

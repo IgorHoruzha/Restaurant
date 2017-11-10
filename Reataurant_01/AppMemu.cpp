@@ -22,8 +22,8 @@ BOOL CALLBACK AppMemu::DlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 
 	case WM_COMMAND:
 		pcPtrAppMenu->Cls_OnCommand(LOWORD(wParam), HIWORD(wParam));
-
 		return TRUE;
+
 	}
 	return FALSE;
 }
@@ -42,11 +42,10 @@ BOOL AppMemu::DishDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 	case WM_COMMAND:
 		pcPtrAppMenu->Cls_DishOnCommand(LOWORD(wParam), HIWORD(wParam));
-
 		return TRUE;
+
 	}
 	return FALSE;
-	return 0;
 }
 
 
@@ -54,11 +53,10 @@ BOOL AppMemu::Cls_OnInitDialog(HWND hwnd)
 {
 	hWnd = hwnd;
 	hMenuShowDishList = GetDlgItem(hwnd, IDC_CMSHOWDISH);
-	//cDishes.clear();
-	if(!cDishes.size())
-	mReadDishesFromFile();
+	if (!cDishes.size())
+		mReadDishesFromFile();
 	mShowDish(hMenuShowDishList);
-	
+
 	return 0;
 }
 
@@ -71,24 +69,23 @@ void AppMemu::Cls_OnCommand(const int& id, const int& message)
 	}
 }
 
-AppMemu::~AppMemu()
-{
-}
 void AppMemu::Cls_OnClose()
 {
 	EndDialog(hWnd, 0);
 }
 
-void AppMemu::mShowDish(HWND hList,int index)
-{//TODO: Show each category by index
+void AppMemu::mShowDish(HWND hList, int index)
+{
+	
+	//TODO: Show each category by index
 
 	SendMessage(hMenuShowDishList, LB_RESETCONTENT, 0, 0);
 	for (auto& cEachDish : cDishes)
 	{
 		if (index == -1)
-		{			
+		{
 			SendMessage(hList, LB_ADDSTRING, 0,
-					LPARAM(cEachDish.mGetDishDescription().c_str()));
+				LPARAM(cEachDish.mGetDishDescription().c_str()));
 		}
 	}
 }
@@ -138,7 +135,6 @@ void AppMemu::Cls_DishOnCommand(const int& id, const int& message)
 				else
 					Type = Dish::Undefined;
 
-		Dish cDish(szName, _wtof(szPrice), Type);
 
 		class DishNameEquality
 		{
@@ -152,15 +148,11 @@ void AppMemu::Cls_DishOnCommand(const int& id, const int& message)
 			{
 				return  element.mGetDishName() == currentDish.mGetDishName();
 			}
-
-			~DishNameEquality() {
-			}
 		};
 
+		Dish cDish(szName, _wtof(szPrice), Type);
 		if (!count_if(cDishes.begin(), cDishes.end(), DishNameEquality(cDish)))
 		{
-
-
 			cDishes.push_back(cDish);
 			SendMessage(hProductList, LB_ADDSTRING, 0,
 				LPARAM(cDish.mGetDishDescription().c_str()));
@@ -191,22 +183,13 @@ wofstream& operator<<(wofstream& Desc, const Dish&  cDish)
 
 void AppMemu::mWriteDishesInFile()
 {
+	wofstream Desc("Dishes.bin", ios_base::out | ios_base::trunc | ios_base::binary);//open binary file for write, delete information in file
 
+	Desc << cDishes.size() << endl;
 
-	
-
-		wofstream Desc("Dishes.bin", ios_base::out | ios_base::trunc | ios_base::binary);//open binary file for write, delete information in file
-	
-		Desc << cDishes.size() << endl;
-		for (auto& cEachDish : cDishes)
-		{		
-			Desc << cEachDish;
-		}
-		Desc.close();
-
-	
-	return;
-
+	for (auto& cEachDish : cDishes)
+		Desc << cEachDish;
+	Desc.close();
 }
 
 void AppMemu::mReadDishesFromFile()
@@ -216,18 +199,17 @@ void AppMemu::mReadDishesFromFile()
 	{
 		throw exception("Dishes.bin");//throw file name for  show error
 	}
-	int nCountDishes = 0;
-
+	size_t nCountDishes = 0;
 	Desc >> nCountDishes;
-	for (int i = 0; i < nCountDishes; i++)
+	for (size_t i = 0; i < nCountDishes; i++)
 	{
-		int nDishNameSize = 0;
+		size_t nDishNameSize = 0;
 		wstring szDishName;
 		Desc >> szDishName;
 		double szDishPrice;
 		Desc >> szDishPrice;
 
-		int nDishType = 0;
+		size_t nDishType = 0;
 		Desc >> nDishType;
 
 		Dish::DishType cDishType = Dish::Undefined;
@@ -245,12 +227,7 @@ void AppMemu::mReadDishesFromFile()
 		default:
 			break;
 		}
-
 		cDishes.push_back(Dish(szDishName, szDishPrice, cDishType));
-
 	}
-
 	Desc.close();
-	
-
 }

@@ -1,6 +1,7 @@
 #pragma once
 #include "Header.h"
 
+
 class AppMemu
 {
 public:
@@ -10,9 +11,7 @@ public:
 	BOOL Cls_OnInitDialog(HWND hwnd);
 	void Cls_OnCommand(const int& id, const int& message);
 	void Cls_OnClose();
-	void mShowDish(HWND hList,int index=-1);
-	~AppMemu();
-	
+	void mShowDish(HWND hList,int index=-1);	
 
 	//Dish
 	static BOOL CALLBACK DishDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
@@ -29,7 +28,5 @@ private:
 	HWND hDishhWnd,hDishName,hDishPrice,hDessert,hHot,hCold, hAddDish,hProductList;
 
 	vector<Dish> cDishes;
-
-
 };
 
