@@ -1,6 +1,7 @@
 #pragma once
 #include "Header.h"
 
+class Dish;//Dish class prototype
 
 class AppMemu
 {

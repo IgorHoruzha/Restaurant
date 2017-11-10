@@ -184,44 +184,45 @@ wofstream& operator<<(wofstream& Desc, const Dish&  cDish)
 void AppMemu::mWriteDishesInFile()
 {
 	wofstream Desc("Dishes.bin", ios_base::out | ios_base::trunc | ios_base::binary);//open binary file for write, delete information in file
-
+	//TODO : Write check for open file
 	Desc << cDishes.size() << endl;
 
-	for (auto& cEachDish : cDishes)
+	for (const auto& cEachDish : cDishes)
 		Desc << cEachDish;
 	Desc.close();
 }
 
 void AppMemu::mReadDishesFromFile()
 {
-	wfstream Desc("Dishes.bin", ios_base::in | ios_base::binary);//open binary file for write, delete information in file
+	wifstream Desc("Dishes.bin", ios_base::in | ios_base::binary);//open binary file for write, delete information in file
 	if (!Desc.is_open())//file is open
 	{
-		throw exception("Dishes.bin");//throw file name for  show error
+		//TODO : Write error if file not open
 	}
 	size_t nCountDishes = 0;
 	Desc >> nCountDishes;
 	for (size_t i = 0; i < nCountDishes; i++)
 	{
-		size_t nDishNameSize = 0;
+	
 		wstring szDishName;
 		Desc >> szDishName;
+
 		double szDishPrice;
 		Desc >> szDishPrice;
 
-		size_t nDishType = 0;
+		int nDishType = 0;
 		Desc >> nDishType;
 
 		Dish::DishType cDishType = Dish::Undefined;
 		switch (nDishType)
 		{
-		case 0:
+		case 1:
 			cDishType = Dish::coldDish;
 			break;
-		case 1:
+		case 2:
 			cDishType = Dish::HotDish;
 			break;
-		case 2:
+		case 3:
 			cDishType = Dish::DessertDish;
 			break;
 		default:

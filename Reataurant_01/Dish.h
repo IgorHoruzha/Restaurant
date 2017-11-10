@@ -1,9 +1,5 @@
 #pragma once
-#include <string>
-using std::wstring;
-#include <fstream>
-using std::wofstream;
-
+#include "Header.h"
 
 class Dish
 {
@@ -20,7 +16,6 @@ private:
 public:
 	Dish();
 	Dish(const wstring &, const double &, const DishType&);
-
 
 	void mSetDishName(const wstring &);
 	void mSetDishPrice(const double &);
