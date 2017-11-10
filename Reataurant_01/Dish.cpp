@@ -36,13 +36,11 @@ void Dish::mSetDishType(const DishType &acDishType)
 
 void Dish::mSetAllFilds(const wstring &acszDishName, const double &anDishPrice, const DishType &acDishType)
 {
-	cszDishName = acszDishName;
-	nDishPrice = anDishPrice;
-	cDishType = acDishType;
+	mSetDishName(acszDishName);
+	mSetDishPrice(anDishPrice);
+	mSetDishType(acDishType);
+
 }
-
-
-
 
 
 const wstring & Dish::mGetDishName() const
@@ -59,7 +57,6 @@ const Dish::DishType& Dish::mGetDishType() const
 {
 	return cDishType;
 }
-
 
 const wstring Dish::mGetDishDescription()const
 {
@@ -80,12 +77,7 @@ const wstring Dish::mGetDishDescription()const
 	default:
 		description += L"Undefined";
 		break;
-
 	}
 	return description;
 }
 
-
-Dish::~Dish()
-{
-}

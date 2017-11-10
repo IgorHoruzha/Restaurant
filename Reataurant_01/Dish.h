@@ -27,16 +27,14 @@ public:
 	void mSetDishName(const wstring &);
 	void mSetDishPrice(const double &);
 	void mSetDishType(const DishType &);
+
 	void mSetAllFilds(const wstring &, const double &, const DishType &);
 
 	const wstring& mGetDishName()const;
     const double& mGetDishPrice()const;
 	const DishType& mGetDishType()const;	
 
-	const wstring mGetDishDescription()const;
-	
+	const wstring mGetDishDescription()const;	
 
-	
-	~Dish();
 };
 
