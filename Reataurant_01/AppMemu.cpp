@@ -1,5 +1,19 @@
 #include "AppMemu.h"
 
+/*
+wofstream and  dish Exemplar
+Write Dish in file
+wofstream Exemplar
+*/
+wofstream& operator<<(wofstream& Desc, const Dish&  cDish)
+{
+	Desc << cDish.mGetDishName().c_str() << endl;
+	Desc << cDish.mGetDishPrice() << endl;
+	Desc << cDish.mGetDishType() << endl;
+	return  Desc;
+}
+
+
 
 AppMemu*  AppMemu::pcPtrAppMenu = nullptr;
 AppMemu::AppMemu()
@@ -60,7 +74,7 @@ BOOL AppMemu::Cls_OnInitDialog(HWND hwnd)
 	return 0;
 }
 
-void AppMemu::Cls_OnCommand(const int& id, const int& message)
+void AppMemu::Cls_OnCommand(const int& id, const int& message) const
 {
 	if (id == IDC_ADDDISH)
 	{
@@ -69,12 +83,12 @@ void AppMemu::Cls_OnCommand(const int& id, const int& message)
 	}
 }
 
-void AppMemu::Cls_OnClose()
+void AppMemu::Cls_OnClose() const
 {
 	EndDialog(hWnd, 0);
 }
 
-void AppMemu::mShowDish(HWND hList, int index)
+void AppMemu::mShowDish(const HWND& hList,const int& index)const
 {
 	
 	//TODO: Show each category by index
@@ -90,7 +104,7 @@ void AppMemu::mShowDish(HWND hList, int index)
 	}
 }
 
-BOOL AppMemu::Cls_DishOnInitDialog(HWND hwnd)
+BOOL AppMemu::Cls_DishOnInitDialog(const HWND& hwnd)
 {
 	hDishhWnd = hwnd;
 
@@ -101,10 +115,11 @@ BOOL AppMemu::Cls_DishOnInitDialog(HWND hwnd)
 	hCold = GetDlgItem(hwnd, Cold);
 	hAddDish = GetDlgItem(hwnd, AddDish);
 	hProductList = GetDlgItem(hwnd, IDC_PRODUCTLIST);
-
+	//TODO: Remove default value setter
 	SetWindowText(hDishName, L"DishName");
 	SetWindowText(hDishPrice, L"123.25");
 	SendDlgItemMessage(hwnd, Hot, BM_SETCHECK, WPARAM(BST_CHECKED), 0);
+	
 	return 0;
 }
 
@@ -173,15 +188,9 @@ void AppMemu::Cls_DishOnClose() const
 	DialogBox(NULL, MAKEINTRESOURCE(IDD_APPMENU), NULL, AppMemu::DlgProc);
 }
 
-wofstream& operator<<(wofstream& Desc, const Dish&  cDish)
-{
-	Desc << cDish.mGetDishName().c_str() << endl;
-	Desc << cDish.mGetDishPrice() << endl;
-	Desc << cDish.mGetDishType() << endl;
-	return  Desc;
-}
 
-void AppMemu::mWriteDishesInFile()
+
+void AppMemu::mWriteDishesInFile()const
 {
 	wofstream Desc("Dishes.bin", ios_base::out | ios_base::trunc | ios_base::binary);//open binary file for write, delete information in file
 	//TODO : Write check for open file
@@ -217,10 +226,10 @@ void AppMemu::mReadDishesFromFile()
 		switch (nDishType)
 		{
 		case 1:
-			cDishType = Dish::coldDish;
+			cDishType = Dish::HotDish;
 			break;
 		case 2:
-			cDishType = Dish::HotDish;
+			cDishType = Dish::coldDish;
 			break;
 		case 3:
 			cDishType = Dish::DessertDish;

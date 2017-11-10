@@ -10,17 +10,17 @@ public:
 	static BOOL CALLBACK DlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);	
 	static AppMemu*  pcPtrAppMenu;
 	BOOL Cls_OnInitDialog(HWND hwnd);
-	void Cls_OnCommand(const int& id, const int& message);
-	void Cls_OnClose();
-	void mShowDish(HWND hList,int index=-1);	
+	void Cls_OnCommand(const int& id, const int& message)const;
+	void Cls_OnClose()const;
+	void mShowDish(const HWND& hList, const int& index=-1)const;
 
 	//Dish
 	static BOOL CALLBACK DishDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
-	BOOL Cls_DishOnInitDialog(HWND hwnd);
+	BOOL Cls_DishOnInitDialog(const HWND& hwnd);
 	void Cls_DishOnCommand(const int& id, const int& message);
 	void Cls_DishOnClose()const;	
 
-	void mWriteDishesInFile();
+	void mWriteDishesInFile()const;
 	void mReadDishesFromFile();
 private:
 	HWND hWnd, hMenuShowDishList;

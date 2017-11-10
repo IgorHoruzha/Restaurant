@@ -1,6 +1,7 @@
 #include "Dish.h"
 
 
+
 Dish::Dish()
 {
 	nDishPrice = NULL;
