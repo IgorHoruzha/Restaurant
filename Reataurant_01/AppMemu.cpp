@@ -23,9 +23,9 @@ wofstream Exemplar
 */
 wofstream& operator<<(wofstream& Desc, const Dish&  cDish)
 {
-	Desc << cDish.mGetDishName().c_str() << endl;
-	Desc << cDish.mGetDishPrice() << endl;
-	Desc << cDish.mGetDishType() << endl;
+	Desc << cDish.mGetDishName() << endl;
+	Desc << cDish.mGetDishPrice() <<" ";
+	Desc << cDish.mGetDishType() ;
 	return  Desc;
 }
 
@@ -255,7 +255,7 @@ void AppMemu::mWriteDishesInFile()const
 {
 	wofstream Desc("Dishes.bin", ios_base::out | ios_base::trunc | ios_base::binary);//open binary file for write, delete information in file
 	//TODO : Write check for open file
-	Desc << cDishes.size() << endl;
+	Desc << cDishes.size() ;
 
 	for (const auto& cEachDish : cDishes)
 		Desc << cEachDish;
@@ -270,13 +270,15 @@ void AppMemu::mReadDishesFromFile()
 		//TODO : Write error if file not open
 	}
 	size_t nCountDishes = 0;
+
+
 	Desc >> nCountDishes;
 	for (size_t i = 0; i < nCountDishes; i++)
 	{
 		wstring szDishName;
-		Desc >> szDishName;
+		getline(Desc, szDishName);
 
-		double szDishPrice;
+		double szDishPrice=0;
 		Desc >> szDishPrice;
 
 		int nDishType = 0;
