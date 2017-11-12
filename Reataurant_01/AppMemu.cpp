@@ -156,8 +156,7 @@ void AppMemu::Cls_DishOnCommand(const int& id, const int& message)
 				mRemoveDish();
 			else
 				MessageBox(hDishhWnd, L"Dish to remove is not selected.", L"ERROR", MB_OK);
-		}
-		
+		}		
 }
 
 void AppMemu::Cls_DishOnClose() const
