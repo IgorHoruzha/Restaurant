@@ -253,8 +253,6 @@ void AppMemu::mRemoveDish()
 	}
 }
 
-
-
 void AppMemu::mWriteDishesInFile()const
 {
 	wofstream Desc("Dishes.bin", ios_base::out | ios_base::trunc | ios_base::binary);//open binary file for write, delete information in file
