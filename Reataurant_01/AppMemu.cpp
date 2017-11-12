@@ -15,7 +15,6 @@ public:
 	}
 };
 
-
 /*
 wofstream and  dish Exemplar
 Write Dish in file
@@ -28,8 +27,6 @@ wofstream& operator<<(wofstream& Desc, const Dish&  cDish)
 	Desc << cDish.mGetDishType() ;
 	return  Desc;
 }
-
-
 
 AppMemu*  AppMemu::pcPtrAppMenu = nullptr;
 AppMemu::AppMemu()

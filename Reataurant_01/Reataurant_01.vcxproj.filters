@@ -45,11 +45,6 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Dishes.bin">
-      <Filter>Source Files</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <Text Include="Dishes.txt">
       <Filter>Source Files</Filter>
     </Text>
