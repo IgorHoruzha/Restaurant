@@ -163,8 +163,7 @@ void AppMemu::Cls_DishOnClose() const
 {
 	mWriteDishesInFile();
 	EndDialog(hDishhWnd, 0);
-	DialogBox(NULL, MAKEINTRESOURCE(IDD_APPMENU), NULL, AppMemu::DlgProc);
-	
+	DialogBox(NULL, MAKEINTRESOURCE(IDD_APPMENU), NULL, AppMemu::DlgProc);	
 }
 
 void AppMemu::mAddDish()
@@ -274,7 +273,6 @@ void AppMemu::mReadDishesFromFile()
 	Desc >> nCountDishes;
 	for (size_t i = 0; i < nCountDishes; i++)
 	{
-
 		wstring szDishName;
 		Desc >> szDishName;
 
