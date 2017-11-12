@@ -24,7 +24,7 @@ wofstream& operator<<(wofstream& Desc, const Dish&  cDish)
 {
 	Desc << cDish.mGetDishName() << endl;
 	Desc << cDish.mGetDishPrice() << endl;
-	Desc << cDish.mGetDishType() ;
+	Desc << cDish.mGetDishType();
 	return  Desc;
 }
 
@@ -130,6 +130,8 @@ BOOL AppMemu::Cls_DishOnInitDialog(const HWND& hwnd)
 	hAddDish = GetDlgItem(hwnd, AddDish);
 	hProductList = GetDlgItem(hwnd, IDC_PRODUCTLIST);
 	hRemoveDish = GetDlgItem(hwnd, IDC_REMOVEDISH);
+	hEditDish = GetDlgItem(hwnd, IDC_EDITDISH);
+	hContinueAddDish = GetDlgItem(hwnd, IDC_CONTINUEADDDISH);
 	//TODO: Remove default value setter
 	SetWindowText(hDishName, L"DishName");
 	SetWindowText(hDishPrice, L"123.25");
@@ -147,20 +149,98 @@ void AppMemu::Cls_DishOnCommand(const int& id, const int& message)
 	}
 	else
 		if (id == IDC_REMOVEDISH)
-			{
-		
-			if(SendMessage(hProductList, LB_GETCURSEL, 0, 0)!=-1)
+		{
+
+			if (SendMessage(hProductList, LB_GETCURSEL, 0, 0) != -1)
 				mRemoveDish();
 			else
 				MessageBox(hDishhWnd, L"Dish to remove is not selected.", L"ERROR", MB_OK);
-		}		
+		}
+
+	if (id == IDC_PRODUCTLIST && message == LBN_SELCHANGE)
+	{
+		if (SendMessage(hProductList, LB_GETCURSEL, 0, 0) != -1)
+		{
+			EnableWindow(hRemoveDish, 1);
+			EnableWindow(hEditDish, 1);
+			EnableWindow(hContinueAddDish, 1);
+			EnableWindow(hAddDish, 0);
+			EnableWindow(hProductList, 0);
+			int index = SendMessage(hProductList, LB_GETCURSEL, 0, 0);
+			if (index != LB_ERR)
+			{
+				int length = SendMessage(hProductList, LB_GETTEXTLEN, index, 0);
+				TCHAR *pBuffer = new TCHAR[length + 1]{ 0 };
+
+				SendMessage(hProductList, LB_GETTEXT, index, LPARAM(pBuffer));
+				wstring szSelectedDish(pBuffer);
+
+				delete[]pBuffer;
+
+				vector<Dish>::iterator it = std::find_if(cDishes.begin(), cDishes.end(), SearchDishThroughThemInfo(szSelectedDish));
+
+				if (it != cDishes.end()) {
+					SetWindowText(hDishName, it->mGetDishName().c_str());
+				
+				
+					SetWindowText(hDishPrice, std::to_wstring(it->mGetDishPrice()).c_str());
+
+					switch (it->mGetDishType())
+					{
+					case 1:
+						SendDlgItemMessage(hWnd, Hot, BM_SETCHECK, WPARAM(BST_CHECKED), 0);
+						break;
+					case 2:
+						SendDlgItemMessage(hWnd, Cold, BM_SETCHECK, WPARAM(BST_CHECKED), 0);
+						break;
+					case 3:
+						SendDlgItemMessage(hWnd, Dessert, BM_SETCHECK, WPARAM(BST_CHECKED), 0);
+						break;
+					default:
+						break;
+					}
+					//TODO: Write here
+					
+
+					MessageBox(NULL, szSelectedDish.c_str(), L"DishEdit", MB_OK);
+				}
+				else {
+					MessageBox(NULL, L"Dish not Found.", L"Error", MB_OK);
+				}
+			}
+		}
+	
+	}
+	if (id == IDC_EDITDISH)
+	{
+		mRemoveDish();
+		mAddDish();
+		EnableWindow(hRemoveDish, 0);
+		EnableWindow(hEditDish, 0);
+		EnableWindow(hContinueAddDish, 0);
+		EnableWindow(hAddDish, 1);
+		EnableWindow(hProductList, 1);
+		SendMessage(hProductList, LB_SETSEL, 0, -1);
+	}
+	if (id == IDC_CONTINUEADDDISH)
+	{
+		EnableWindow(hRemoveDish, 0);
+		EnableWindow(hEditDish, 0);
+		EnableWindow(hContinueAddDish, 0);
+		EnableWindow(hAddDish, 1);
+		EnableWindow(hProductList, 1);
+		SendMessage(hProductList, LB_SETSEL, 0, -1);
+
+	}
 }
+
+
 
 void AppMemu::Cls_DishOnClose() const
 {
 	mWriteDishesInFile();
 	EndDialog(hDishhWnd, 0);
-	DialogBox(NULL, MAKEINTRESOURCE(IDD_APPMENU), NULL, AppMemu::DlgProc);	
+	DialogBox(NULL, MAKEINTRESOURCE(IDD_APPMENU), NULL, AppMemu::DlgProc);
 }
 
 void AppMemu::mAddDish()
@@ -194,7 +274,7 @@ void AppMemu::mAddDish()
 		const Dish * element;
 	public:
 
-		DishNameEquality(const Dish& element)  {
+		DishNameEquality(const Dish& element) {
 			this->element = &element;
 		}
 
@@ -233,9 +313,9 @@ void AppMemu::mRemoveDish()
 
 		delete[]pBuffer;
 
-		vector<Dish>::iterator it= std::find_if(cDishes.begin(), cDishes.end(), SearchDishThroughThemInfo(szSelectedDish));		
-		
-		if (it!= cDishes.end()) {
+		vector<Dish>::iterator it = std::find_if(cDishes.begin(), cDishes.end(), SearchDishThroughThemInfo(szSelectedDish));
+
+		if (it != cDishes.end()) {
 			remove_if(cDishes.begin(), cDishes.end(), SearchDishThroughThemInfo(szSelectedDish));
 			cDishes.resize(cDishes.size() - 1);
 
@@ -251,9 +331,9 @@ void AppMemu::mRemoveDish()
 
 void AppMemu::mWriteDishesInFile()const
 {
-	wofstream Desc("Dishes.txt", ios_base::out | ios_base::trunc );//open binary file for write, delete information in file
+	wofstream Desc("Dishes.txt", ios_base::out | ios_base::trunc);//open binary file for write, delete information in file
 	//TODO : Write check for open file
-	Desc << cDishes.size() ;
+	Desc << cDishes.size();
 
 	for (const auto& cEachDish : cDishes)
 		Desc << cEachDish;
@@ -275,7 +355,7 @@ void AppMemu::mReadDishesFromFile()
 		wstring szDishName;
 		getline(Desc, szDishName);
 
-		double szDishPrice=0;
+		double szDishPrice = 0;
 		Desc >> szDishPrice;
 
 		int nDishType = 0;
