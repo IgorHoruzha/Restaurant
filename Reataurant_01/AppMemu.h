@@ -30,8 +30,8 @@ private:
 	HWND hWnd, hMenuShowDishList;
 
 	//Dish
-	HWND hDishhWnd,hDishName,hDishPrice,hDessert,hHot,hCold, hAddDish,hProductList,
-		hRemoveDish;
+	HWND hDishhWnd,hDishName,hDishPrice,hDessert,hHot,hCold, hAddDish,
+		hProductList,hRemoveDish,hEditDish,hContinueAddDish;
 
 	vector<Dish> cDishes;
 };
