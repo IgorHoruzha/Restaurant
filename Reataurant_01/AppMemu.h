@@ -20,6 +20,7 @@ public:
 	void Cls_DishOnCommand(const int& id, const int& message);
 	void Cls_DishOnClose()const;	
 
+	
 	void mAddDish();
 	void mRemoveDish();
 
