@@ -254,7 +254,7 @@ void AppMemu::mRemoveDish()
 
 void AppMemu::mWriteDishesInFile()const
 {
-	wofstream Desc("Dishes.bin", ios_base::out | ios_base::trunc | ios_base::binary);//open binary file for write, delete information in file
+	wofstream Desc("Dishes.txt", ios_base::out | ios_base::trunc );//open binary file for write, delete information in file
 	//TODO : Write check for open file
 	Desc << cDishes.size() ;
 
@@ -265,7 +265,7 @@ void AppMemu::mWriteDishesInFile()const
 
 void AppMemu::mReadDishesFromFile()
 {
-	wifstream Desc("Dishes.bin", ios_base::in | ios_base::binary);//open binary file for write, delete information in file
+	wifstream Desc("Dishes.txt", ios_base::in);//open binary file for write, delete information in file
 	if (!Desc.is_open())//file is open
 	{
 		//TODO : Write error if file not open
