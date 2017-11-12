@@ -24,7 +24,7 @@ wofstream Exemplar
 wofstream& operator<<(wofstream& Desc, const Dish&  cDish)
 {
 	Desc << cDish.mGetDishName() << endl;
-	Desc << cDish.mGetDishPrice() <<" ";
+	Desc << cDish.mGetDishPrice() << endl;
 	Desc << cDish.mGetDishType() ;
 	return  Desc;
 }
@@ -194,15 +194,16 @@ void AppMemu::mAddDish()
 
 	class DishNameEquality
 	{
-		const Dish  element;
+		const Dish * element;
 	public:
 
-		DishNameEquality(const Dish& element) :element(element) {
+		DishNameEquality(const Dish& element)  {
+			this->element = &element;
 		}
 
 		bool operator()(const Dish& currentDish) const
 		{
-			return  element.mGetDishName() == currentDish.mGetDishName();
+			return  element->mGetDishName() == currentDish.mGetDishName();
 		}
 	};
 
