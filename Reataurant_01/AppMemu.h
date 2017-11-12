@@ -20,7 +20,9 @@ public:
 	void Cls_DishOnCommand(const int& id, const int& message);
 	void Cls_DishOnClose()const;	
 
+	
 	void mAddDish();
+	void mRemoveDish();
 
 	void mWriteDishesInFile()const;
 	void mReadDishesFromFile();
@@ -28,7 +30,8 @@ private:
 	HWND hWnd, hMenuShowDishList;
 
 	//Dish
-	HWND hDishhWnd,hDishName,hDishPrice,hDessert,hHot,hCold, hAddDish,hProductList;
+	HWND hDishhWnd,hDishName,hDishPrice,hDessert,hHot,hCold, hAddDish,hProductList,
+		hRemoveDish;
 
 	vector<Dish> cDishes;
 };

@@ -1,5 +1,21 @@
 #include "AppMemu.h"
 
+class SearchDishThroughThemInfo
+{
+	const wstring*  description;
+public:
+
+	SearchDishThroughThemInfo(const wstring& description) {
+		this->description = &description;
+	}
+
+	bool operator()(const Dish& currentDish) const
+	{
+		return  *description == currentDish.mGetDishDescription();
+	}
+};
+
+
 /*
 wofstream and  dish Exemplar
 Write Dish in file
@@ -85,12 +101,13 @@ void AppMemu::Cls_OnCommand(const int& id, const int& message) const
 
 void AppMemu::Cls_OnClose() const
 {
+	mWriteDishesInFile();
 	EndDialog(hWnd, 0);
 }
 
-void AppMemu::mShowDish(const HWND& hList,const int& index)const
+void AppMemu::mShowDish(const HWND& hList, const int& index)const
 {
-	
+
 	//TODO: Show each category by index
 
 	SendMessage(hMenuShowDishList, LB_RESETCONTENT, 0, 0);
@@ -115,13 +132,15 @@ BOOL AppMemu::Cls_DishOnInitDialog(const HWND& hwnd)
 	hCold = GetDlgItem(hwnd, Cold);
 	hAddDish = GetDlgItem(hwnd, AddDish);
 	hProductList = GetDlgItem(hwnd, IDC_PRODUCTLIST);
+	hRemoveDish = GetDlgItem(hwnd, IDC_REMOVEDISH);
 	//TODO: Remove default value setter
 	SetWindowText(hDishName, L"DishName");
 	SetWindowText(hDishPrice, L"123.25");
 	SendDlgItemMessage(hwnd, Hot, BM_SETCHECK, WPARAM(BST_CHECKED), 0);
-	
+	mShowDish(hProductList, -1);
 	return 0;
 }
+
 
 void AppMemu::Cls_DishOnCommand(const int& id, const int& message)
 {
@@ -129,12 +148,24 @@ void AppMemu::Cls_DishOnCommand(const int& id, const int& message)
 	{
 		mAddDish();
 	}
+	else
+		if (id == IDC_REMOVEDISH)
+			{
+		
+			if(SendMessage(hProductList, LB_GETCURSEL, 0, 0)!=-1)
+				mRemoveDish();
+			else
+				MessageBox(hDishhWnd, L"Dish to remove is not selected.", L"ERROR", MB_OK);
+		}
+		
 }
 
 void AppMemu::Cls_DishOnClose() const
 {
+	mWriteDishesInFile();
 	EndDialog(hDishhWnd, 0);
 	DialogBox(NULL, MAKEINTRESOURCE(IDD_APPMENU), NULL, AppMemu::DlgProc);
+	
 }
 
 void AppMemu::mAddDish()
@@ -188,9 +219,38 @@ void AppMemu::mAddDish()
 	{
 		MessageBox(NULL, cDish.mGetDishDescription().c_str(), L"ERROR", MB_OK);
 	}
-	mWriteDishesInFile();
+
 	delete[]szName;
 	delete[]szPrice;
+}
+
+void AppMemu::mRemoveDish()
+{
+	int index = SendMessage(hProductList, LB_GETCURSEL, 0, 0);
+	if (index != LB_ERR)
+	{
+		int length = SendMessage(hProductList, LB_GETTEXTLEN, index, 0);
+		TCHAR *pBuffer = new TCHAR[length + 1]{ 0 };
+
+		SendMessage(hProductList, LB_GETTEXT, index, LPARAM(pBuffer));
+		wstring szSelectedDish(pBuffer);
+
+		delete[]pBuffer;
+
+		vector<Dish>::iterator it= std::find_if(cDishes.begin(), cDishes.end(), SearchDishThroughThemInfo(szSelectedDish));		
+		
+		if (it!= cDishes.end()) {
+			remove_if(cDishes.begin(), cDishes.end(), SearchDishThroughThemInfo(szSelectedDish));
+			cDishes.resize(cDishes.size() - 1);
+
+			SendMessage(hProductList, LB_DELETESTRING, index, 0);
+
+			MessageBox(NULL, szSelectedDish.c_str(), L"Delete dish", MB_OK);
+		}
+		else {
+			MessageBox(NULL, L"Dish not Found.", L"Error", MB_OK);
+		}
+	}
 }
 
 
@@ -217,7 +277,7 @@ void AppMemu::mReadDishesFromFile()
 	Desc >> nCountDishes;
 	for (size_t i = 0; i < nCountDishes; i++)
 	{
-	
+
 		wstring szDishName;
 		Desc >> szDishName;
 
