@@ -106,7 +106,7 @@ void AppMemu::mShowDish(const HWND& hList,const int& index)const
 
 BOOL AppMemu::Cls_DishOnInitDialog(const HWND& hwnd)
 {
-	hDishhWnd = hwnd;
+	hDishhWnd = hwnd; 
 
 	hDishName = GetDlgItem(hwnd, DishName);
 	hDishPrice = GetDlgItem(hwnd, DishPrice);
@@ -115,6 +115,7 @@ BOOL AppMemu::Cls_DishOnInitDialog(const HWND& hwnd)
 	hCold = GetDlgItem(hwnd, Cold);
 	hAddDish = GetDlgItem(hwnd, AddDish);
 	hProductList = GetDlgItem(hwnd, IDC_PRODUCTLIST);
+	hRemoveDish= GetDlgItem(hwnd, IDC_REMOVEDISH);
 	//TODO: Remove default value setter
 	SetWindowText(hDishName, L"DishName");
 	SetWindowText(hDishPrice, L"123.25");
@@ -128,6 +129,10 @@ void AppMemu::Cls_DishOnCommand(const int& id, const int& message)
 	if (id == AddDish)
 	{
 		mAddDish();
+	}else
+	if (id == IDC_REMOVEDISH)
+	{
+		mRemoveDish();
 	}
 }
 
@@ -191,6 +196,11 @@ void AppMemu::mAddDish()
 	mWriteDishesInFile();
 	delete[]szName;
 	delete[]szPrice;
+}
+
+void AppMemu::mRemoveDish()
+{
+//TODO: Write Remove dish from list here
 }
 
 
