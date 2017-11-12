@@ -127,58 +127,7 @@ void AppMemu::Cls_DishOnCommand(const int& id, const int& message)
 {
 	if (id == AddDish)
 	{
-		wchar_t *szName = nullptr;
-		wchar_t *szPrice = nullptr;
-
-		int nLength = SendMessage(hDishName, WM_GETTEXTLENGTH, 0, 0) + 2;
-		szName = new wchar_t[nLength];
-		GetWindowText(hDishName, szName, nLength);
-
-		nLength = SendMessage(hDishPrice, WM_GETTEXTLENGTH, 0, 0) + 2;
-		szPrice = new wchar_t[nLength];
-		GetWindowText(hDishPrice, szPrice, nLength);
-
-		Dish::DishType Type;
-		if (IsDlgButtonChecked(hDishhWnd, Dessert))
-			Type = Dish::DessertDish;
-		else
-			if (IsDlgButtonChecked(hDishhWnd, Hot))
-				Type = Dish::HotDish;
-			else
-				if (IsDlgButtonChecked(hDishhWnd, Cold))
-					Type = Dish::coldDish;
-				else
-					Type = Dish::Undefined;
-
-
-		class DishNameEquality
-		{
-			const Dish  element;
-		public:
-
-			DishNameEquality(const Dish& element) :element(element) {
-			}
-
-			bool operator()(const Dish& currentDish) const
-			{
-				return  element.mGetDishName() == currentDish.mGetDishName();
-			}
-		};
-
-		Dish cDish(szName, _wtof(szPrice), Type);
-		if (!count_if(cDishes.begin(), cDishes.end(), DishNameEquality(cDish)))
-		{
-			cDishes.push_back(cDish);
-			SendMessage(hProductList, LB_ADDSTRING, 0,
-				LPARAM(cDish.mGetDishDescription().c_str()));
-		}
-		else
-		{
-			MessageBox(NULL, cDish.mGetDishDescription().c_str(), L"ERROR", MB_OK);
-		}
-		mWriteDishesInFile();
-		delete[]szName;
-		delete[]szPrice;
+		mAddDish();
 	}
 }
 
@@ -186,6 +135,62 @@ void AppMemu::Cls_DishOnClose() const
 {
 	EndDialog(hDishhWnd, 0);
 	DialogBox(NULL, MAKEINTRESOURCE(IDD_APPMENU), NULL, AppMemu::DlgProc);
+}
+
+void AppMemu::mAddDish()
+{
+	wchar_t *szName = nullptr;
+	wchar_t *szPrice = nullptr;
+
+	int nLength = SendMessage(hDishName, WM_GETTEXTLENGTH, 0, 0) + 2;
+	szName = new wchar_t[nLength];
+	GetWindowText(hDishName, szName, nLength);
+
+	nLength = SendMessage(hDishPrice, WM_GETTEXTLENGTH, 0, 0) + 2;
+	szPrice = new wchar_t[nLength];
+	GetWindowText(hDishPrice, szPrice, nLength);
+
+	Dish::DishType Type;
+	if (IsDlgButtonChecked(hDishhWnd, Dessert))
+		Type = Dish::DessertDish;
+	else
+		if (IsDlgButtonChecked(hDishhWnd, Hot))
+			Type = Dish::HotDish;
+		else
+			if (IsDlgButtonChecked(hDishhWnd, Cold))
+				Type = Dish::coldDish;
+			else
+				Type = Dish::Undefined;
+
+
+	class DishNameEquality
+	{
+		const Dish  element;
+	public:
+
+		DishNameEquality(const Dish& element) :element(element) {
+		}
+
+		bool operator()(const Dish& currentDish) const
+		{
+			return  element.mGetDishName() == currentDish.mGetDishName();
+		}
+	};
+
+	Dish cDish(szName, _wtof(szPrice), Type);
+	if (!count_if(cDishes.begin(), cDishes.end(), DishNameEquality(cDish)))
+	{
+		cDishes.push_back(cDish);
+		SendMessage(hProductList, LB_ADDSTRING, 0,
+			LPARAM(cDish.mGetDishDescription().c_str()));
+	}
+	else
+	{
+		MessageBox(NULL, cDish.mGetDishDescription().c_str(), L"ERROR", MB_OK);
+	}
+	mWriteDishesInFile();
+	delete[]szName;
+	delete[]szPrice;
 }
 
 
