@@ -39,7 +39,7 @@ wofstream& operator<<(wofstream& Desc, const Dish&  cDish)
 {
 	Desc << cDish.mGetDishName() << endl;
 	Desc << cDish.mGetDishPrice() << endl;
-	Desc << cDish.mGetDishType();
+	Desc << cDish.mGetDishType() << endl;
 	return  Desc;
 }
 
@@ -316,7 +316,7 @@ void AppMemu::mWriteDishesInFile()const
 {
 	wofstream Desc("Dishes.txt", ios_base::out | ios_base::trunc);//open binary file for write, delete information in file
 	//TODO : Write check for open file
-	Desc << cDishes.size();
+	Desc << cDishes.size() << endl;
 
 	for (const auto& cEachDish : cDishes)
 		Desc << cEachDish;
@@ -331,18 +331,22 @@ void AppMemu::mReadDishesFromFile()
 		//TODO : Write error if file not open
 	}
 	size_t nCountDishes = 0;
-
-	Desc >> nCountDishes;
+	wstring szBuffer;
+	getline(Desc, szBuffer);
+	nCountDishes = _wtof(szBuffer.c_str());
+	//Desc >> nCountDishes;
 	for (size_t i = 0; i < nCountDishes; i++)
 	{
 		wstring szDishName;
 		getline(Desc, szDishName);
 
-		double szDishPrice = 0;
-		Desc >> szDishPrice;
+		double szDishPrice = 0;	
+		getline(Desc, szBuffer);
+		szDishPrice = _wtof(szBuffer.c_str());
 
-		int nDishType = 0;
-		Desc >> nDishType;
+		int nDishType = 0;	
+		getline(Desc, szBuffer);
+		nDishType = _wtoi(szBuffer.c_str());
 
 		Dish::DishType cDishType = Dish::Undefined;
 		switch (nDishType)
