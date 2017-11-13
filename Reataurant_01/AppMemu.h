@@ -20,7 +20,7 @@ public:
 	void Cls_DishOnCommand(const int& id, const int& message);
 	void Cls_DishOnClose()const;	
 
-	
+	const wstring mGetDishDescriptionFromListByIndex(const HWND&hList,const int &index)const;
 	void mAddDish();
 	void mRemoveDish();
 

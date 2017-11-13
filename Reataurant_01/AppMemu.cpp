@@ -148,90 +148,76 @@ void AppMemu::Cls_DishOnCommand(const int& id, const int& message)
 		mAddDish();
 	}
 	else
-		if (id == IDC_REMOVEDISH)
-		{
 
-			if (SendMessage(hProductList, LB_GETCURSEL, 0, 0) != -1)
-				mRemoveDish();
-			else
-				MessageBox(hDishhWnd, L"Dish to remove is not selected.", L"ERROR", MB_OK);
-		}
-
-	if (id == IDC_PRODUCTLIST && message == LBN_SELCHANGE)
-	{
-		if (SendMessage(hProductList, LB_GETCURSEL, 0, 0) != -1)
+		if (id == IDC_REMOVEDISH || id == IDC_EDITDISH || id == IDC_CONTINUEADDDISH)
 		{
-			EnableWindow(hRemoveDish, 1);
-			EnableWindow(hEditDish, 1);
-			EnableWindow(hContinueAddDish, 1);
-			EnableWindow(hAddDish, 0);
-			EnableWindow(hProductList, 0);
-			int index = SendMessage(hProductList, LB_GETCURSEL, 0, 0);
-			if (index != LB_ERR)
+			if (id == IDC_CONTINUEADDDISH)
 			{
-				int length = SendMessage(hProductList, LB_GETTEXTLEN, index, 0);
-				TCHAR *pBuffer = new TCHAR[length + 1]{ 0 };
-
-				SendMessage(hProductList, LB_GETTEXT, index, LPARAM(pBuffer));
-				wstring szSelectedDish(pBuffer);
-
-				delete[]pBuffer;
-
-				vector<Dish>::iterator it = std::find_if(cDishes.begin(), cDishes.end(), SearchDishThroughThemInfo(szSelectedDish));
-
-				if (it != cDishes.end()) {
-					SetWindowText(hDishName, it->mGetDishName().c_str());
-				
-				
-					SetWindowText(hDishPrice, std::to_wstring(it->mGetDishPrice()).c_str());
-
-					switch (it->mGetDishType())
-					{
-					case 1:
-						SendDlgItemMessage(hWnd, Hot, BM_SETCHECK, WPARAM(BST_CHECKED), 0);
-						break;
-					case 2:
-						SendDlgItemMessage(hWnd, Cold, BM_SETCHECK, WPARAM(BST_CHECKED), 0);
-						break;
-					case 3:
-						SendDlgItemMessage(hWnd, Dessert, BM_SETCHECK, WPARAM(BST_CHECKED), 0);
-						break;
-					default:
-						break;
-					}
-					//TODO: Write here
-					
-
-					MessageBox(NULL, szSelectedDish.c_str(), L"DishEdit", MB_OK);
-				}
-				else {
-					MessageBox(NULL, L"Dish not Found.", L"Error", MB_OK);
-				}
+				EnableWindow(hRemoveDish, 0);
+				EnableWindow(hEditDish, 0);
+				EnableWindow(hContinueAddDish, 0);
+				EnableWindow(hAddDish, 1);				
+				SendMessage(hProductList, LB_SETSEL, 0, -1);
 			}
+			else
+				if (SendMessage(hProductList, LB_GETCURSEL, 0, 0) != -1) {
+					mRemoveDish();
+					if (id == IDC_EDITDISH)
+						mAddDish();
+				}
+				else
+					MessageBox(hDishhWnd, L"Dish to remove is not selected.", L"ERROR", MB_OK);
+			EnableWindow(hProductList, 1);
 		}
-	
-	}
-	if (id == IDC_EDITDISH)
-	{
-		mRemoveDish();
-		mAddDish();
-		EnableWindow(hRemoveDish, 0);
-		EnableWindow(hEditDish, 0);
-		EnableWindow(hContinueAddDish, 0);
-		EnableWindow(hAddDish, 1);
-		EnableWindow(hProductList, 1);
-		SendMessage(hProductList, LB_SETSEL, 0, -1);
-	}
-	if (id == IDC_CONTINUEADDDISH)
-	{
-		EnableWindow(hRemoveDish, 0);
-		EnableWindow(hEditDish, 0);
-		EnableWindow(hContinueAddDish, 0);
-		EnableWindow(hAddDish, 1);
-		EnableWindow(hProductList, 1);
-		SendMessage(hProductList, LB_SETSEL, 0, -1);
+		else
+			if (id == IDC_PRODUCTLIST && message == LBN_SELCHANGE)
+			{
+				if (SendMessage(hProductList, LB_GETCURSEL, 0, 0) != -1)
+				{
+					EnableWindow(hRemoveDish, 1);
+					EnableWindow(hEditDish, 1);
+					EnableWindow(hContinueAddDish, 1);
+					EnableWindow(hAddDish, 0);
+					EnableWindow(hProductList, 0);
 
-	}
+					int index = SendMessage(hProductList, LB_GETCURSEL, 0, 0);
+					if (index != LB_ERR)
+					{						
+						wstring szSelectedDish(mGetDishDescriptionFromListByIndex(hProductList,index));
+
+						vector<Dish>::iterator it = std::find_if(cDishes.begin(), cDishes.end(), SearchDishThroughThemInfo(szSelectedDish));
+
+						if (it != cDishes.end()) {
+							SetWindowText(hDishName, it->mGetDishName().c_str());
+
+
+							SetWindowText(hDishPrice, std::to_wstring(it->mGetDishPrice()).c_str());
+
+							switch (it->mGetDishType())
+							{
+							case 1:
+								SendDlgItemMessage(hWnd, Hot, BM_SETCHECK, WPARAM(BST_CHECKED), 0);
+								break;
+							case 2:
+								SendDlgItemMessage(hWnd, Cold, BM_SETCHECK, WPARAM(BST_CHECKED), 0);
+								break;
+							case 3:
+								SendDlgItemMessage(hWnd, Dessert, BM_SETCHECK, WPARAM(BST_CHECKED), 0);
+								break;
+							default:
+								break;
+							}
+							MessageBox(NULL, szSelectedDish.c_str(), L"DishEdit", MB_OK);
+						}
+						else {
+							MessageBox(NULL, L"Dish not Found.", L"Error", MB_OK);
+						}
+					}
+				}
+
+			}
+
+
 }
 
 
@@ -241,6 +227,18 @@ void AppMemu::Cls_DishOnClose() const
 	mWriteDishesInFile();
 	EndDialog(hDishhWnd, 0);
 	DialogBox(NULL, MAKEINTRESOURCE(IDD_APPMENU), NULL, AppMemu::DlgProc);
+}
+
+const wstring AppMemu::mGetDishDescriptionFromListByIndex(const HWND & hList, const int & index) const
+{
+	size_t length = SendMessage(hProductList, LB_GETTEXTLEN, index, 0);
+	TCHAR *pBuffer = new TCHAR[length + 1]{ 0 };
+
+	SendMessage(hProductList, LB_GETTEXT, index, LPARAM(pBuffer));
+	const wstring szSelectedDish(pBuffer);
+
+	delete[]pBuffer;
+	return szSelectedDish;
 }
 
 void AppMemu::mAddDish()
@@ -305,21 +303,14 @@ void AppMemu::mRemoveDish()
 	int index = SendMessage(hProductList, LB_GETCURSEL, 0, 0);
 	if (index != LB_ERR)
 	{
-		int length = SendMessage(hProductList, LB_GETTEXTLEN, index, 0);
-		TCHAR *pBuffer = new TCHAR[length + 1]{ 0 };
-
-		SendMessage(hProductList, LB_GETTEXT, index, LPARAM(pBuffer));
-		wstring szSelectedDish(pBuffer);
-
-		delete[]pBuffer;
-
+		
+		const wstring szSelectedDish(mGetDishDescriptionFromListByIndex(hProductList,index));
+		
 		vector<Dish>::iterator it = std::find_if(cDishes.begin(), cDishes.end(), SearchDishThroughThemInfo(szSelectedDish));
-
+		SendMessage(hProductList, LB_DELETESTRING, index, 0);
 		if (it != cDishes.end()) {
 			remove_if(cDishes.begin(), cDishes.end(), SearchDishThroughThemInfo(szSelectedDish));
-			cDishes.resize(cDishes.size() - 1);
-
-			SendMessage(hProductList, LB_DELETESTRING, index, 0);
+			cDishes.resize(cDishes.size() - 1);	
 
 			MessageBox(NULL, szSelectedDish.c_str(), L"Delete dish", MB_OK);
 		}
