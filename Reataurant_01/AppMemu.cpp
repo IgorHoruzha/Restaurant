@@ -15,6 +15,21 @@ public:
 	}
 };
 
+class DishNameEquality
+{
+	const Dish * element;
+public:
+
+	DishNameEquality(const Dish& element) {
+		this->element = &element;
+	}
+
+	bool operator()(const Dish& currentDish) const
+	{
+		return  element->mGetDishName() == currentDish.mGetDishName();
+	}
+};
+
 /*
 wofstream and  dish Exemplar
 Write Dish in file
@@ -104,17 +119,14 @@ void AppMemu::Cls_OnClose() const
 
 void AppMemu::mShowDish(const HWND& hList, const int& index)const
 {
-
 	//TODO: Show each category by index
 
 	SendMessage(hList, LB_RESETCONTENT, 0, 0);
 	for (auto& cEachDish : cDishes)
 	{
-		if (index == -1)
-		{
+		if (index == -1)		
 			SendMessage(hList, LB_ADDSTRING, 0,
 				LPARAM(cEachDish.mGetDishDescription().c_str()));
-		}
 	}
 }
 
@@ -148,7 +160,6 @@ void AppMemu::Cls_DishOnCommand(const int& id, const int& message)
 		mAddDish();
 	}
 	else
-
 		if (id == IDC_REMOVEDISH || id == IDC_EDITDISH || id == IDC_CONTINUEADDDISH)
 		{
 			if (id == IDC_CONTINUEADDDISH)
@@ -156,7 +167,7 @@ void AppMemu::Cls_DishOnCommand(const int& id, const int& message)
 				EnableWindow(hRemoveDish, 0);
 				EnableWindow(hEditDish, 0);
 				EnableWindow(hContinueAddDish, 0);
-				EnableWindow(hAddDish, 1);				
+				EnableWindow(hAddDish, 1);
 				SendMessage(hProductList, LB_SETSEL, 0, -1);
 			}
 			else
@@ -182,14 +193,13 @@ void AppMemu::Cls_DishOnCommand(const int& id, const int& message)
 
 					int index = SendMessage(hProductList, LB_GETCURSEL, 0, 0);
 					if (index != LB_ERR)
-					{						
-						wstring szSelectedDish(mGetDishDescriptionFromListByIndex(hProductList,index));
+					{
+						wstring szSelectedDish(mGetDishDescriptionFromListByIndex(hProductList, index));
 
-						vector<Dish>::iterator it = std::find_if(cDishes.begin(), cDishes.end(), SearchDishThroughThemInfo(szSelectedDish));
+						vector<Dish>::iterator it = mGetDishIteratorByDescription(szSelectedDish);
 
 						if (it != cDishes.end()) {
 							SetWindowText(hDishName, it->mGetDishName().c_str());
-
 
 							SetWindowText(hDishPrice, std::to_wstring(it->mGetDishPrice()).c_str());
 
@@ -214,10 +224,7 @@ void AppMemu::Cls_DishOnCommand(const int& id, const int& message)
 						}
 					}
 				}
-
 			}
-
-
 }
 
 
@@ -227,6 +234,11 @@ void AppMemu::Cls_DishOnClose() const
 	mWriteDishesInFile();
 	EndDialog(hDishhWnd, 0);
 	DialogBox(NULL, MAKEINTRESOURCE(IDD_APPMENU), NULL, AppMemu::DlgProc);
+}
+
+const vector<Dish>::iterator AppMemu::mGetDishIteratorByDescription(const wstring & szDishDescription) 
+{
+	return std::find_if(cDishes.begin(), cDishes.end(), SearchDishThroughThemInfo(szDishDescription));
 }
 
 const wstring AppMemu::mGetDishDescriptionFromListByIndex(const HWND & hList, const int & index) const
@@ -246,11 +258,11 @@ void AppMemu::mAddDish()
 	wchar_t *szName = nullptr;
 	wchar_t *szPrice = nullptr;
 
-	int nLength = SendMessage(hDishName, WM_GETTEXTLENGTH, 0, 0) + 2;
+	int nLength = SendMessage(hDishName, WM_GETTEXTLENGTH, 0, 0) + 1;
 	szName = new wchar_t[nLength];
 	GetWindowText(hDishName, szName, nLength);
 
-	nLength = SendMessage(hDishPrice, WM_GETTEXTLENGTH, 0, 0) + 2;
+	nLength = SendMessage(hDishPrice, WM_GETTEXTLENGTH, 0, 0) + 1;
 	szPrice = new wchar_t[nLength];
 	GetWindowText(hDishPrice, szPrice, nLength);
 
@@ -266,22 +278,6 @@ void AppMemu::mAddDish()
 			else
 				Type = Dish::Undefined;
 
-
-	class DishNameEquality
-	{
-		const Dish * element;
-	public:
-
-		DishNameEquality(const Dish& element) {
-			this->element = &element;
-		}
-
-		bool operator()(const Dish& currentDish) const
-		{
-			return  element->mGetDishName() == currentDish.mGetDishName();
-		}
-	};
-
 	Dish cDish(szName, _wtof(szPrice), Type);
 	if (!count_if(cDishes.begin(), cDishes.end(), DishNameEquality(cDish)))
 	{
@@ -289,10 +285,9 @@ void AppMemu::mAddDish()
 		SendMessage(hProductList, LB_ADDSTRING, 0,
 			LPARAM(cDish.mGetDishDescription().c_str()));
 	}
-	else
-	{
+	else	
 		MessageBox(NULL, cDish.mGetDishDescription().c_str(), L"ERROR", MB_OK);
-	}
+	
 
 	delete[]szName;
 	delete[]szPrice;
@@ -303,20 +298,17 @@ void AppMemu::mRemoveDish()
 	int index = SendMessage(hProductList, LB_GETCURSEL, 0, 0);
 	if (index != LB_ERR)
 	{
-		
-		const wstring szSelectedDish(mGetDishDescriptionFromListByIndex(hProductList,index));
-		
-		vector<Dish>::iterator it = std::find_if(cDishes.begin(), cDishes.end(), SearchDishThroughThemInfo(szSelectedDish));
-		SendMessage(hProductList, LB_DELETESTRING, index, 0);
-		if (it != cDishes.end()) {
-			remove_if(cDishes.begin(), cDishes.end(), SearchDishThroughThemInfo(szSelectedDish));
-			cDishes.resize(cDishes.size() - 1);	
+		const wstring szSelectedDishDescription(mGetDishDescriptionFromListByIndex(hProductList, index));
 
-			MessageBox(NULL, szSelectedDish.c_str(), L"Delete dish", MB_OK);
+		SendMessage(hProductList, LB_DELETESTRING, index, 0);
+		if (mGetDishIteratorByDescription(szSelectedDishDescription) != cDishes.end()) {
+			remove_if(cDishes.begin(), cDishes.end(), SearchDishThroughThemInfo(szSelectedDishDescription));
+			cDishes.resize(cDishes.size() - 1);
+
+			MessageBox(NULL, szSelectedDishDescription.c_str(), L"Delete dish", MB_OK);
 		}
-		else {
-			MessageBox(NULL, L"Dish not Found.", L"Error", MB_OK);
-		}
+		else MessageBox(NULL, L"Dish not Found.", L"Error", MB_OK);
+		
 	}
 }
 
