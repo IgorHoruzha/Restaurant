@@ -333,7 +333,7 @@ void AppMemu::mReadDishesFromFile()
 	size_t nCountDishes = 0;
 	wstring szBuffer;
 	getline(Desc, szBuffer);
-	nCountDishes = _wtof(szBuffer.c_str());
+	nCountDishes = _wtoi(szBuffer.c_str());
 	//Desc >> nCountDishes;
 	for (size_t i = 0; i < nCountDishes; i++)
 	{
