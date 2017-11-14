@@ -14,8 +14,8 @@ using std::wstring;
 using std::vector;
 
 #include <fstream>
-using std::wofstream;
-using std::wifstream;
+using std::ofstream;
+using std::ifstream;
 
 #include <algorithm>
 

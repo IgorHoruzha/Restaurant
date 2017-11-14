@@ -35,13 +35,13 @@ wofstream and  dish Exemplar
 Write Dish in file
 wofstream Exemplar
 */
-wofstream& operator<<(wofstream& Desc, const Dish&  cDish)
-{
-	Desc << cDish.mGetDishName() << endl;
-	Desc << cDish.mGetDishPrice() << endl;
-	Desc << cDish.mGetDishType() << endl;
-	return  Desc;
-}
+//wofstream& operator<<(wofstream& Desc, const Dish&  cDish)
+//{
+//	Desc << cDish.mGetDishName() << endl;
+//	Desc << cDish.mGetDishPrice() << endl;
+//	Desc << cDish.mGetDishType() << endl;
+//	return  Desc;
+//}
 
 AppMemu*  AppMemu::pcPtrAppMenu = nullptr;
 AppMemu::AppMemu()
@@ -314,56 +314,62 @@ void AppMemu::mRemoveDish()
 
 void AppMemu::mWriteDishesInFile()const
 {
-	wofstream Desc("Dishes.txt", ios_base::out | ios_base::trunc);//open binary file for write, delete information in file
+	ofstream Desc("Dishes.bin", ios_base::out | ios_base::trunc| ios_base::binary);//open binary file for write, delete information in file
 	//TODO : Write check for open file
-	Desc << cDishes.size() << endl;
-
-	for (const auto& cEachDish : cDishes)
-		Desc << cEachDish;
+	size_t nCountDish = cDishes.size();
+	Desc.write(reinterpret_cast<char*>(&nCountDish), sizeof(nCountDish));
+	for (auto cEachDish : cDishes)
+		cEachDish.mWriteInFile(Desc);
 	Desc.close();
 }
 
 void AppMemu::mReadDishesFromFile()
 {
-	wifstream Desc("Dishes.txt", ios_base::in);//open binary file for write, delete information in file
+	ifstream Desc("Dishes.bin", ios_base::in);//open binary file for write, delete information in file
 	if (!Desc.is_open())//file is open
 	{
 		//TODO : Write error if file not open
 	}
+
 	size_t nCountDishes = 0;
-	wstring szBuffer;
-	getline(Desc, szBuffer);
-	nCountDishes = _wtoi(szBuffer.c_str());
-	//Desc >> nCountDishes;
+	Desc.read(reinterpret_cast<char*>(&nCountDishes), 4);
+	
+
 	for (size_t i = 0; i < nCountDishes; i++)
 	{
-		wstring szDishName;
-		getline(Desc, szDishName);
+		size_t nDishNameLength = 0;
+		Desc.read(reinterpret_cast<char*>(&nDishNameLength), sizeof(nDishNameLength));
+		
+		wchar_t* szDishName = new wchar_t[nDishNameLength+1]{0};
 
-		double szDishPrice = 0;	
-		getline(Desc, szBuffer);
-		szDishPrice = _wtof(szBuffer.c_str());
+		Desc.read(reinterpret_cast<char*>(szDishName), nDishNameLength);
+		nDishNameLength = 0;
 
-		int nDishType = 0;	
-		getline(Desc, szBuffer);
-		nDishType = _wtoi(szBuffer.c_str());
+		double nDishPrice = 0;
+		Desc.read(reinterpret_cast<char*>(&nDishPrice), sizeof(nDishPrice));
 
-		Dish::DishType cDishType = Dish::Undefined;
-		switch (nDishType)
-		{
-		case 1:
-			cDishType = Dish::HotDish;
-			break;
-		case 2:
-			cDishType = Dish::coldDish;
-			break;
-		case 3:
-			cDishType = Dish::DessertDish;
-			break;
-		default:
-			break;
-		}
-		cDishes.push_back(Dish(szDishName, szDishPrice, cDishType));
+		int nDishType = 0;
+		Desc.read(reinterpret_cast<char*>(&nDishType), sizeof(nDishType));
+
+			Dish::DishType cDishType = Dish::Undefined;
+			switch (nDishType)
+			{
+			case 1:
+				cDishType = Dish::HotDish;
+				break;
+			case 2:
+				cDishType = Dish::coldDish;
+				break;
+			case 3:
+				cDishType = Dish::DessertDish;
+				break;
+			default:
+				break;
+			}
+			cDishes.push_back(Dish(szDishName, nDishPrice, cDishType));
+
+		delete[]szDishName;
 	}
+	
 	Desc.close();
 }

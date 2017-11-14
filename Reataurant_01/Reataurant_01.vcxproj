@@ -163,6 +163,9 @@
   <ItemGroup>
     <Text Include="Dishes.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Dishes.bin" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

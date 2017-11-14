@@ -1,7 +1,6 @@
 #include "Dish.h"
 
 
-
 Dish::Dish()
 {
 	nDishPrice = NULL;
@@ -50,6 +49,22 @@ const double & Dish::mGetDishPrice() const
 const Dish::DishType& Dish::mGetDishType() const
 {
 	return cDishType;
+}
+
+const void Dish::mWriteInFile(ofstream & Desc)
+{
+	size_t nlength = wcslen(cszDishName.c_str())* sizeof(wchar_t);
+
+	Desc.write(reinterpret_cast<char*>(&nlength), sizeof(nlength));
+	wchar_t *szDishName = new wchar_t[nlength+1]{0};
+
+	wcscpy_s(szDishName, nlength,cszDishName.c_str());
+
+	Desc.write(reinterpret_cast<char*>(szDishName),  nlength);
+	Desc.write(reinterpret_cast<char*>(&nDishPrice), sizeof(nDishPrice));
+	Desc.write(reinterpret_cast<char*>(&cDishType), sizeof(cDishType));
+
+	delete[]szDishName;
 }
 
 const wstring Dish::mGetDishDescription()const

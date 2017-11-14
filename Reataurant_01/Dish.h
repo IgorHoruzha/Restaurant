@@ -26,7 +26,7 @@ public:
 	const wstring& mGetDishName()const;
     const double& mGetDishPrice()const;
 	const DishType& mGetDishType()const;	
-
+	const void mWriteInFile(ofstream &Desc);
 	const wstring mGetDishDescription()const;	
 
 };
