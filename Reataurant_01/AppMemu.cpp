@@ -137,16 +137,21 @@ void AppMemu::mShowDish(const HWND& hList, const int& index)const
 	SendMessage(hList, LB_RESETCONTENT, 0, 0);
 	for (auto& cEachDish : cDishes)
 	{
+		
+
+
 		int a = 0;
-		a=pow(2,int(cEachDish.mGetDishType()));
+		a=pow(2,int(cEachDish.mGetDishType()));	
+
 		if (index == -1)		
 			SendMessage(hList, LB_ADDSTRING, 0,
 				LPARAM(cEachDish.mGetDishDescription().c_str()));
-		else if(a&index&&			
-			(szName[0]?0==wcscmp(szName, cEachDish.mGetDishName().c_str()):1&&
-				_wtof(szPrice)?_wtof(szPrice)== cEachDish.mGetDishPrice():1))
+		else if ((index ? (a&index) : 1) &&
+			( szName[0] ? 0 == wcscmp(szName, cEachDish.mGetDishName().c_str()) : 1) &&
+			( _wtof(szPrice) ? _wtof(szPrice) == cEachDish.mGetDishPrice() : 1))
 			SendMessage(hList, LB_ADDSTRING, 0,
 				LPARAM(cEachDish.mGetDishDescription().c_str()));
+	
 	}
 
 	delete[]szName;
