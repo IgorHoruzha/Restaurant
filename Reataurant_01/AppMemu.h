@@ -12,7 +12,7 @@ public:
 	BOOL Cls_OnInitDialog(HWND hwnd);
 	void Cls_OnCommand(const int& id, const int& message)const;
 	void Cls_OnClose()const;
-	void mShowDish(const HWND& hList, const int& index=-1)const;
+	void mShowDish(const HWND& hList, const int& index)const;
 
 	//Dish
 	static BOOL CALLBACK DishDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
@@ -29,7 +29,8 @@ public:
 	void mWriteDishesInFile()const;
 	void mReadDishesFromFile();
 private:
-	HWND hWnd, hMenuShowDishList;
+	HWND hWnd, hMenuShowDishList,
+		hMemuNameSearch, hMemuPriceSearch;
 
 	//Dish
 	HWND hDishhWnd,hDishName,hDishPrice,hDessert,hHot,hCold, hAddDish,
