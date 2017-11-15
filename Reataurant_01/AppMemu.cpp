@@ -1,5 +1,5 @@
 #include "AppMemu.h"
-
+#include <cmath>
 class SearchDishThroughThemInfo
 {
 	const wstring*  description;
@@ -30,18 +30,6 @@ public:
 	}
 };
 
-/*
-wofstream and  dish Exemplar
-Write Dish in file
-wofstream Exemplar
-*/
-//wofstream& operator<<(wofstream& Desc, const Dish&  cDish)
-//{
-//	Desc << cDish.mGetDishName() << endl;
-//	Desc << cDish.mGetDishPrice() << endl;
-//	Desc << cDish.mGetDishType() << endl;
-//	return  Desc;
-//}
 
 AppMemu*  AppMemu::pcPtrAppMenu = nullptr;
 AppMemu::AppMemu()
@@ -97,7 +85,9 @@ BOOL AppMemu::Cls_OnInitDialog(HWND hwnd)
 	hMenuShowDishList = GetDlgItem(hwnd, IDC_CMSHOWDISH);
 	if (!cDishes.size())
 		mReadDishesFromFile();
-	mShowDish(hMenuShowDishList);
+	mShowDish(hMenuShowDishList,-1);
+	hMemuNameSearch = GetDlgItem(hwnd, IDC_CMNAME);
+	hMemuPriceSearch = GetDlgItem(hwnd, IDC_CMPRICE);
 
 	return 0;
 }
@@ -109,6 +99,19 @@ void AppMemu::Cls_OnCommand(const int& id, const int& message) const
 		Cls_OnClose();
 		DialogBox(NULL, MAKEINTRESOURCE(EditDish), NULL, AppMemu::DishDlgProc);
 	}
+	else
+		if (id== IDC_CMNAME||id== IDC_CMPRICE ||id == IDC_CMHOT || id == IDC_CMCOLD || id == IDC_CMDESERT)
+		{
+			int nDish=0;
+			if (IsDlgButtonChecked(hWnd, IDC_CMHOT))
+				nDish |= 2;
+				if (IsDlgButtonChecked(hWnd, IDC_CMCOLD))
+					nDish |= 4;			
+					if (IsDlgButtonChecked(hWnd, IDC_CMDESERT))
+						nDish |= 8;					
+						
+			mShowDish(hMenuShowDishList, nDish);
+		}		
 }
 
 void AppMemu::Cls_OnClose() const
@@ -120,14 +123,35 @@ void AppMemu::Cls_OnClose() const
 void AppMemu::mShowDish(const HWND& hList, const int& index)const
 {
 	//TODO: Show each category by index
+	wchar_t *szName = nullptr;
+	wchar_t *szPrice = nullptr;
+
+	int nLength = SendMessage(hMemuNameSearch, WM_GETTEXTLENGTH, 0, 0) + 1;
+	szName = new wchar_t[nLength];
+	GetWindowText(hMemuNameSearch, szName, nLength);
+
+	nLength = SendMessage(hMemuPriceSearch, WM_GETTEXTLENGTH, 0, 0) + 1;
+	szPrice = new wchar_t[nLength];
+	GetWindowText(hMemuPriceSearch, szPrice, nLength);
 
 	SendMessage(hList, LB_RESETCONTENT, 0, 0);
 	for (auto& cEachDish : cDishes)
 	{
+		int a = 0;
+		a=pow(2,int(cEachDish.mGetDishType()));
 		if (index == -1)		
 			SendMessage(hList, LB_ADDSTRING, 0,
 				LPARAM(cEachDish.mGetDishDescription().c_str()));
+		else if(a&index&&			
+			(szName[0]?0==wcscmp(szName, cEachDish.mGetDishName().c_str()):1&&
+				_wtof(szPrice)?_wtof(szPrice)== cEachDish.mGetDishPrice():1))
+			SendMessage(hList, LB_ADDSTRING, 0,
+				LPARAM(cEachDish.mGetDishDescription().c_str()));
 	}
+
+	delete[]szName;
+	delete[]szPrice;
+
 }
 
 BOOL AppMemu::Cls_DishOnInitDialog(const HWND& hwnd)
